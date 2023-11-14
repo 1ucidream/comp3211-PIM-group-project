@@ -86,7 +86,8 @@ public class PIMManager {
         System.out.println("Welcome to PIM.");
         Scanner sc = new Scanner(System.in);
 
-        String op = new String();
+        String op = new String();//这个op好像没啥用啊
+
         label74:
         do {
             System.out.println("---Enter a command (supported commands are list create save load quit)---");
@@ -172,13 +173,15 @@ public class PIMManager {
                 case "load":
                     loadData();
                     break;
+
+                //这里把 break 改成 break label74, 就不会跳到 108行 的输入命令
                 case "quit":
                     sc.close();
-                    break;
+                    break label74;
                 default:
                     System.out.println("the command is not exist");
             }
-        } while(!op.equals("quit"));
+        } while(true);//感觉这个条件直接改成while( 1 )死循环也可以啊
 
     }
 

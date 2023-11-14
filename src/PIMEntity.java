@@ -1,9 +1,15 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
+
+
 
 import java.io.Serializable;
+
+/**
+ * entity类除了设置优先级以外啥都没有!
+ * 废物
+ * 不如就把全部可能会有的属性全都加在这个entity顶层里算了
+ * 因为判断text是否包含在PIR的contains方法需要在entity这里完成而不是在criterion里
+ * 但也可以在每个子类里重写containsText()这样应该也可以8
+ */
 
 public abstract class PIMEntity implements Serializable {
     String Priority;

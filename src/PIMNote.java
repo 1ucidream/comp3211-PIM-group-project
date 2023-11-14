@@ -3,6 +3,13 @@
 // (powered by FernFlower decompiler)
 //
 
+/**
+ * 这个note类就是备忘录, 以文本内容为主体
+ * 新增一个创建的时间戳, 用于搜索
+ * 但是如果要修改怎么办呢
+ *
+ */
+
 public class PIMNote extends PIMEntity {
     String noteText;
 
@@ -13,6 +20,7 @@ public class PIMNote extends PIMEntity {
         return this.noteText;
     }
 
+    //修改内容就用这个set方法?
     public void setNoteText(String noteText) {
         this.noteText = noteText;
     }

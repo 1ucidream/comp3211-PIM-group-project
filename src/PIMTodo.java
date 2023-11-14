@@ -1,10 +1,19 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
+import java.time.LocalDateTime;
+
+/**
+ * 待办事项类
+ *
+ */
 
 public class PIMTodo extends PIMEntity implements SharedDate {
+
+    //格式化的日期放在这个str里
     String date;
+
+    //日期类方便管理和比较, 输入时可以按格式输入:yy-mm-dd, 然后转换成date类
+    LocalDateTime dateTime;
+
+    //todo的内容, 查找的时候可以用todotext.contains(目标串)?
     String toDoText;
 
     public PIMTodo() {
