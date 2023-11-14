@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 import java.time.LocalDateTime;
 
 /**
@@ -10,10 +5,11 @@ import java.time.LocalDateTime;
  * 要有alarm, startime, description
  */
 
-public class PIMAppointment extends PIMEntity {
+public class PIMEvent extends PIMEntity {
 
     String description;
-    String date;
+
+    String start_time_Str;
     LocalDateTime start_time;
 
     //没想好alarm是什么功能, 暂时设置为date类好了
@@ -21,15 +17,15 @@ public class PIMAppointment extends PIMEntity {
     LocalDateTime alarm_time;
 
 
-    public PIMAppointment() {
+    public PIMEvent() {
     }
 
     public String getDate() {
-        return this.date;
+        return this.start_time_Str;
     }
 
     public void setDate(String date) {
-        this.date = date;
+        this.start_time_Str = date;
     }
 
     public String getDescription() {
@@ -44,6 +40,6 @@ public class PIMAppointment extends PIMEntity {
     }
 
     public String toString() {
-        return "APPOINTMENT " + this.Priority + " " + this.date + " " + this.description;
+        return "Event " + this.Priority + " " + this.start_time_Str + " " + this.description;
     }
 }
