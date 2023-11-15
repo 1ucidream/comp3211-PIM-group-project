@@ -6,7 +6,11 @@
 public class PIMContact extends PIMEntity {
     String firstName;
     String lastName;
-    String email;
+    //String email;
+
+    String address;
+
+    String phoneNum;
 
     public PIMContact() {
     }
@@ -27,18 +31,37 @@ public class PIMContact extends PIMEntity {
         this.lastName = lastName;
     }
 
-    public String getEmail() {
+    public  void setAddress(String address) {
+        this.address = address;
+    }
+    /*public String getEmail() {
         return this.email;
     }
 
     void setEmail(String email) {
         this.email = email;
     }
-
+*/
+    public void setPhoneNum(String s){
+        this.phoneNum = s;
+    }
     public void fromString(String ex) {
     }
 
+    /*
     public String toString() {
-        return "CONTACT " + this.Priority + " " + this.firstName + " " + this.lastName + " " + this.email;
+        return "type: CONTACT " + "\n" +
+                "Prio" + this.Priority + " " + this.firstName + " " + this.lastName + " " + this.address;
     }
+*/
+    //把tostring改了, 每条记录的每个信息点换行输出, contact应该不需要priority吧
+    public String toString() {
+        return  "----------------------------------------"+ "\n" +
+                "---type: CONTACT " + "\n" +
+                "---Name: " + this.firstName + " " + this.lastName +"\n" +
+                "---Address: " + this.address + "\n" +
+                "---PhoneNums:"+ this.phoneNum + "\n" +
+                "----------------------------------------";
+    }
+
 }
