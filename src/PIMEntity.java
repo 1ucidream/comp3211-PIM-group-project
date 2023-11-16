@@ -2,6 +2,7 @@
 
 
 import java.io.Serializable;
+import java.util.Scanner;
 
 /**
  * entity类除了设置优先级以外啥都没有!
@@ -33,4 +34,9 @@ public abstract class PIMEntity implements Serializable {
     public abstract void fromString(String var1);
 
     public abstract String toString();
+
+    public abstract void update(Scanner scanner);
+
+    public abstract void containsText(String inputText);
+
 }

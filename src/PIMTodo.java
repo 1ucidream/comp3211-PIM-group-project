@@ -1,5 +1,6 @@
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
 
 /**
  * 待办事项类
@@ -51,5 +52,20 @@ public class PIMTodo extends PIMEntity {
                 "---Deadline: " + this.deadline_str + "\n" +
                 "---Description: " + this.description + "\n" +
                 "----------------------------------------";
+    }
+
+    /**
+     * 对todo的更新, 应该让用户选择要更新deadline or description
+     * 输入1-dead, 2-descri, 3-两个都更新switch-case(两个都更新为什么不直接建一个新的...PIMManager.createTodo()...再把原来的指向这个新的)
+     * 1-dead: 要判断时间格式及其合法性
+     */
+    @Override
+    public void update(Scanner scanner) {
+
+    }
+
+    @Override
+    public void containsText(String inputText) {
+
     }
 }

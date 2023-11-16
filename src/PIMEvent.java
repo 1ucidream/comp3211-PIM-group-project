@@ -1,5 +1,6 @@
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
 
 /**
  * 其实appoint差不多就是题目要求的events
@@ -65,6 +66,16 @@ public class PIMEvent extends PIMEntity {
                 "---Start Time: " + this.start_time_Str + "\n" +
                 "---Description: " + this.description + "\n" +
                 "----------------------------------------";
+    }
+
+    @Override
+    public void update(Scanner scanner) {
+
+    }
+
+    @Override
+    public void containsText(String inputText) {
+
     }
 
 

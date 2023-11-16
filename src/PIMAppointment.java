@@ -4,6 +4,7 @@
 //
 
 import java.time.LocalDateTime;
+import java.util.Scanner;
 
 /**
  * 其实appoint差不多就是题目要求的events
@@ -45,5 +46,15 @@ public class PIMAppointment extends PIMEntity {
 
     public String toString() {
         return "APPOINTMENT " + this.Priority + " " + this.date + " " + this.description;
+    }
+
+    @Override
+    public void update(Scanner scanner) {
+
+    }
+
+    @Override
+    public void containsText(String inputText) {
+
     }
 }

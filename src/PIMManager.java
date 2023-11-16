@@ -33,7 +33,20 @@ public class PIMManager {
     static LinkedList<PIMEntity> itemList;
 
     static Scanner sc;
-
+    /**
+     * 一个静态代码块，它在类加载时执行，并且只会执行一次。静态代码块的主要目的是在类加载时进行一些初始化操作。
+     *
+     * 根据代码片段提供的信息，可以推断出以下几点：
+     *
+     * dataFilePath 是一个字符串变量，表示数据文件的路径。
+     * dataFile 是一个 File 对象，用于表示数据文件。
+     * itemList 是一个 LinkedList 对象，用于存储数据项。
+     */
+    static {
+        dataFile = new File(dataFilePath);
+        itemList = new LinkedList();
+        sc = new Scanner(System.in);
+    }
     public PIMManager() {}
 
     private static void saveData() {
@@ -222,6 +235,7 @@ public class PIMManager {
     }
 
     static void createNote(){
+
         String text;
 
         //输入note内容
@@ -304,9 +318,13 @@ public class PIMManager {
     /**
      * 删除特定记录:
      * 1.用户键盘输入想要删的index 空格分隔
-     * 2.接收并解析为int数组
-     * 3.用iterator正序遍历list, remove即可
+     * 2.接收并解析为int数组, 升序排列
+     * 2.2.判断每个index是否合法, 是则进入3., 否则进入下一个index
+     * 3.倒序遍历list, remove(index)即可
      * 4.输出反馈, 还剩几个
+     */
+    /**
+     * 11-16: 增加删除功能
      */
     private static void deleteData() {
         //判断是否可以删除
@@ -363,6 +381,63 @@ public class PIMManager {
         }
     }
 
+    /**11-16: 增加修改功能
+     * 跟删除类似, 先输入待删除数组, 转为int, 挨个判断index合法性
+     * a)合法: 判断item是todo, note, event, contact哪种; 调用对应子类的item.update方法, update写在子类里面
+     */
+
+    private static void updateData(){
+
+        //用户输入想要update的item num
+        if(itemList.size() >= 1){
+            //提示用户选择要update的记录
+            System.out.println("-------------Enter the item number(starts from number 1) to update " + "\n" +
+                               "(separated by spaces): e.g. 2 4 1 5");
+            System.out.println("-------------❗❗❗❗❗❗❗❗if you want to update the 1st record, please enter number 1 ");
+            String input = sc.nextLine();
+
+            System.out.println("-------------The item(s) to update: " + input);
+            String[] indexStrings = input.split(" ");
+            int[] indices = new int[indexStrings.length];
+
+            //解析用户输入的索引
+            for (int i = 0; i < indexStrings.length; i++) {
+                indices[i] = Integer.parseInt(indexStrings[i]) - 1;
+            }
+
+            //update成功的item计数器
+            int updateCounter = 0;
+
+            //应该是先判断当前的index是否合法, 合法则进入item遍历, 非法则继续下一个index
+            for (int index: indices){
+                System.out.println("-------------updating Item " + (index+1) );
+                //判断index合法性, 不使用iterator了, 实在是不好用
+                if( index >= 0 && index < itemList.size() ){
+                    //index合法:
+                    itemList.get(index).update(sc);
+                    //itemList.remove(index);
+                    System.out.println("Item " + (index + 1) + " updated" + "\n");
+                    updateCounter++;
+
+                }else {
+                    //继续循环下一个index,输出更新失败
+                    System.out.println("-------------❗Invalid Item Number: " + (index + 1) + "; Failed to update❗" + "\n");
+                }
+            }
+
+            //之后要save
+            System.out.println("-------------Do you want to save the update?  Enter y or n");
+
+            //saveData();
+            //输出反馈, 过程结束
+            System.out.println("-------------⭐End of Update⭐" + "\n" +
+                    "             ⭐" + updateCounter + " item(s) updated.");
+        }else {
+            System.out.println("-------------❗There's no record to update❗");
+        }
+
+    }
+
     static void printList(){
         System.out.println("There are " + itemList.size() + " items.");
         int i = 0;
@@ -381,10 +456,6 @@ public class PIMManager {
     /**
      * 打印主菜单
      */
-    /**
-     * 11-16: 增加删除功能
-     */
-
     static void printMainMenu(){
         System.out.println("----------------------------------------");
         System.out.println("-          Enter a command             -");
@@ -393,8 +464,9 @@ public class PIMManager {
                         "-            l -> list                 -" +"\n"+
                         "-            c -> create               -" +"\n"+
                         "-            s -> save                 -" +"\n"+
-                        "-            e -> exit                 -" +"\n"+
                         "-            d -> delete               -" +"\n"+
+                        "-            u -> update               -" +"\n"+
+                        "-            e -> exit                 -" +"\n"+
                         "----------------------------------------");
     }
 
@@ -415,6 +487,8 @@ public class PIMManager {
                         "----------------------------------------");
     }
     public static void main(String[] args) throws IOException {
+
+
         if (!dataFile.exists()) {
             dataFile.createNewFile();
         } else {
@@ -449,28 +523,25 @@ public class PIMManager {
                     deleteData();//删除之后不会自动保存, 便于测试!
                     continue ;
 
+                case "u" :
+                    updateData();//自动保存, 便于测试!
+                    saveData();
+                    continue ;
+
                 default:
                     System.out.println("-------------❗the command is not exist❗");
             }
-        } while(true);//感觉这个条件直接改成while( 1 )死循环也可以啊
+        } while(true);//感觉这个条件直接改成while( 1 )死循环也可以啊/**/
+
+
     }
 
-
-
-    /**
-     * 一个静态代码块，它在类加载时执行，并且只会执行一次。静态代码块的主要目的是在类加载时进行一些初始化操作。
-     *
-     * 根据代码片段提供的信息，可以推断出以下几点：
-     *
-     * dataFilePath 是一个字符串变量，表示数据文件的路径。
-     * dataFile 是一个 File 对象，用于表示数据文件。
-     * itemList 是一个 LinkedList 对象，用于存储数据项。
-     */
-    static {
-        dataFile = new File(dataFilePath);
-        itemList = new LinkedList();
-        sc = new Scanner(System.in);
-
+    static void testU(Scanner sc){
+        printMainMenu();
+        String input = sc.nextLine();
+        System.out.println(input);
+        input = sc.nextLine();
+        System.out.println(input);
     }
 
     //hello

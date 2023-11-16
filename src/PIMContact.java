@@ -3,6 +3,8 @@
 // (powered by FernFlower decompiler)
 //
 
+import java.util.Scanner;
+
 public class PIMContact extends PIMEntity {
     String firstName;
     String lastName;
@@ -62,6 +64,20 @@ public class PIMContact extends PIMEntity {
                 "---Address: " + this.address + "\n" +
                 "---PhoneNums:"+ this.phoneNum + "\n" +
                 "----------------------------------------";
+    }
+
+    /**
+     * update之前要打印一下自己, 让用户看见, 再问要更新哪个字段
+     * 更新完再打印一次
+     */
+    @Override
+    public void update(Scanner scanner) {
+
+    }
+
+    @Override
+    public void containsText(String inputText) {
+
     }
 
 }
