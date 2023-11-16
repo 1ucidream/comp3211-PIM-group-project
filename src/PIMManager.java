@@ -10,6 +10,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -30,7 +32,7 @@ public class PIMManager {
 
     static LinkedList<PIMEntity> itemList;
 
-    static Scanner sc = new Scanner(System.in);
+    static Scanner sc;
 
     public PIMManager() {}
 
@@ -272,23 +274,92 @@ public class PIMManager {
         switch (sc.nextLine()) {
             case "t":
                 createTodo();
+                saveData();
                 break;
 
             case "n":
                 createNote();
+                saveData();
                 break;
 
             case "e"://把appoint改成event
                 createEvent();
+                saveData();
                 break;
 
             case "c":
                 createContact();
+                saveData();
                 break;
+
+            case "b"://返回主菜单
+                break ;
 
             default:
                 System.out.println("!!!!!!!!! the item type is not exist !!!!!!!!");
                 break;
+        }
+    }
+
+    /**
+     * 删除特定记录:
+     * 1.用户键盘输入想要删的index 空格分隔
+     * 2.接收并解析为int数组
+     * 3.用iterator正序遍历list, remove即可
+     * 4.输出反馈, 还剩几个
+     */
+    private static void deleteData() {
+        //判断是否可以删除
+        if(itemList.size() >= 1){
+            //提示用户选择要删除的记录
+            System.out.println("-------------Enter the item number(starts from number 1) to delete " + "\n" +
+                    "(separated by spaces): e.g. 2 4 1 5");
+            System.out.println("-------------❗❗❗❗❗❗❗❗if you want to delete the 1st record, please enter number 1 ");
+            String input = sc.nextLine();
+
+            System.out.println("-------------The items to delete: " + input);
+            String[] indexStrings = input.split(" ");
+            int[] indices = new int[indexStrings.length];
+
+            //解析用户输入的索引
+            for (int i = 0; i < indexStrings.length; i++) {
+                //System.out.println("字符串转int: " + Integer.parseInt(indexStrings[i]));// 输入3, 输出3
+                indices[i] = Integer.parseInt(indexStrings[i]) - 1;
+                //System.out.println("-------------The items to delete: " + indices[i]);//输入3, 输出0, 闹鬼了
+            }
+
+            //把待删除index按升序排列
+            Arrays.sort(indices);
+
+            //删除记录
+            //Iterator<PIMEntity> iterator = itemList.iterator();
+
+            //遍历LinkedList，Iterator删除记录
+            //应该是先判断当前的index是否合法, 合法则进入iterator, 非法则继续下一个index
+            //但这样从前往后删除, 每次list的长度都变化, 所以要从后往前删除
+            for (int i = indices.length - 1; i >= 0; i--){
+                int index = indices[i];
+                System.out.println("-------------Deleting Item " + (index+1) );
+                //判断index合法性, 不使用iterator了, 实在是不好用
+                if( index >= 0 && index < itemList.size() ){
+                    //index合法:
+                    itemList.remove(index);
+                    System.out.println("Item " + (index + 1) + " deleted" + "\n");
+                }else {
+                    //继续循环下一个index,输出删除失败
+                    System.out.println("-------------❗Invalid Item Number: " + (index + 1) + "; Failed to delete❗" + "\n");
+                }
+            }
+
+            //删除之后要save
+            System.out.println("-------------Do you want to save the deletion?  Enter y or n");
+
+            //saveData();
+            //输出反馈, 删除过程结束
+            System.out.println("-------------⭐End of deletion⭐" + "\n" +
+                    "             ⭐" + itemList.size() + " item(s) left.");
+        }else {
+            System.out.println("-------------❗There's no record to delete❗");
         }
     }
 
@@ -310,6 +381,10 @@ public class PIMManager {
     /**
      * 打印主菜单
      */
+    /**
+     * 11-16: 增加删除功能
+     */
+
     static void printMainMenu(){
         System.out.println("----------------------------------------");
         System.out.println("-          Enter a command             -");
@@ -319,27 +394,29 @@ public class PIMManager {
                         "-            c -> create               -" +"\n"+
                         "-            s -> save                 -" +"\n"+
                         "-            e -> exit                 -" +"\n"+
+                        "-            d -> delete               -" +"\n"+
                         "----------------------------------------");
     }
 
     /**
      * 打印create各种事项的菜单
      */
+    //如果不想创建, 增加一个返回主菜单
     static void printCreateMenu(){
         System.out.println("----------------------------------------");
         System.out.println("-      Enter an item type(number)      -");
         System.out.println("----------------------------------------");
         System.out.println(
-                "-            t -> todo                 -" +"\n"+
-                        "-            n -> note                 -" +"\n"+
-                        "-            c -> contact              -" +"\n"+
-                        "-            e -> event                -" +"\n"+
+                        "-            t -> todo                 -" +"\n"+
+                        "-            n -> note" +"\n"+
+                        "-            c -> contact" +"\n"+
+                        "-            e -> event" +"\n"+
+                        "-            b -> back to Main Menu" +"\n"+
                         "----------------------------------------");
     }
     public static void main(String[] args) throws IOException {
         if (!dataFile.exists()) {
             dataFile.createNewFile();
-
         } else {
             loadData();
         }
@@ -359,6 +436,7 @@ public class PIMManager {
                     continue ;
                 case "c":
                     createData();
+                    //自动保存
                     continue ;
                 case "s":
                     saveData();
@@ -367,12 +445,17 @@ public class PIMManager {
                 case "e":
                     sc.close();
                     break label74;
+                case "d" :
+                    deleteData();//删除之后不会自动保存, 便于测试!
+                    continue ;
+
                 default:
-                    System.out.println("------❗the command is not exist❗--------");
+                    System.out.println("-------------❗the command is not exist❗");
             }
         } while(true);//感觉这个条件直接改成while( 1 )死循环也可以啊
-
     }
+
+
 
     /**
      * 一个静态代码块，它在类加载时执行，并且只会执行一次。静态代码块的主要目的是在类加载时进行一些初始化操作。
@@ -386,6 +469,8 @@ public class PIMManager {
     static {
         dataFile = new File(dataFilePath);
         itemList = new LinkedList();
+        sc = new Scanner(System.in);
+
     }
 
     //hello
