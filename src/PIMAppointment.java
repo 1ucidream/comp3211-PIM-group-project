@@ -49,8 +49,9 @@ public class PIMAppointment extends PIMEntity {
     }
 
     @Override
-    public void update(Scanner scanner) {
+    public boolean update(Scanner scanner) {
 
+        return false;
     }
 
     @Override

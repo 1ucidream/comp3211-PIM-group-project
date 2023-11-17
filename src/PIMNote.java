@@ -7,8 +7,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
-import static java.awt.SystemColor.text;
-
 /**
  * 这个note类就是备忘录, 以文本内容为主体new plain texts as PIRs
  * 新增一个establish的时间戳, 用于搜索
@@ -79,20 +77,21 @@ public class PIMNote extends PIMEntity {
     }
 
     @Override
-    public void update(Scanner scanner) {
-
-        int updateCount = 0;
+    public boolean update(Scanner scanner) {
+        //int updateCount = 0;
         //传进来的scanner是可以用的!
 
         //提示用户, 当前记录为note, 输入新的text
+        //System.out.println("-------------⭐You are updating a Note");
         System.out.println("-------------Enter new text:");
         String input = scanner.nextLine();
-        setNoteText(input);
 
+        setNoteText(input);
         setUpdatedTime(LocalDateTime.now());
 
         //输出反馈
         System.out.println("-------------⭐Successfully updated⭐" + "\n" + this);
+        return true;
     }
 
     @Override

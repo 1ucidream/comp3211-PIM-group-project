@@ -35,7 +35,7 @@ public abstract class PIMEntity implements Serializable {
 
     public abstract String toString();
 
-    public abstract void update(Scanner scanner);
+    public abstract boolean update(Scanner scanner);
 
     public abstract void containsText(String inputText);
 

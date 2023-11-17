@@ -33,6 +33,9 @@ public class PIMManager {
     static LinkedList<PIMEntity> itemList;
 
     static Scanner sc;
+
+    //update成功的item计数器
+    static int updateCounter;
     /**
      * 一个静态代码块，它在类加载时执行，并且只会执行一次。静态代码块的主要目的是在类加载时进行一些初始化操作。
      *
@@ -46,6 +49,7 @@ public class PIMManager {
         dataFile = new File(dataFilePath);
         itemList = new LinkedList();
         sc = new Scanner(System.in);
+        updateCounter = 0;
     }
     public PIMManager() {}
 
@@ -103,13 +107,10 @@ public class PIMManager {
         System.out.println("--------⭐Successfully loaded⭐--------");
     }
 
-    static void createTodo(){
-        //todo 的 date意思是deadline
-        String date;
-        String text;
-
-        PIMTodo todo = new PIMTodo();
-
+    /**
+     * 把判断输入时间字符串合法性放在一个方法里, 合法返回true
+     */
+    static boolean isTimeValid(String inputTime){
         // 定义日期时间格式化器
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -117,30 +118,32 @@ public class PIMManager {
         String pattern = "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$";
         boolean isFormatValid;
 
+        isFormatValid = Pattern.matches(pattern, inputTime);
+
+        return isFormatValid;
+    }
+    static void createTodo(){
+        //todo 的 date意思是deadline
+        String date;
+        String text;
+
+        PIMTodo todo = new PIMTodo();
+
+        boolean isFormatValid ;
+
         do {
-            //提示用户输入startTime
+            //提示用户输入deadline
             System.out.println("-------------Enter Deadline for todo( format：yyyy-MM-dd HH:mm:ss ) ：");
             date = sc.nextLine();
-            isFormatValid = Pattern.matches(pattern, date);
+            isFormatValid =  isTimeValid(date);
 
             if (!isFormatValid) {
                 System.out.println("------------❗Invalid format❗------------");
-            } else {
-                isFormatValid = true;
-                //break label;  在日期格式正确时跳出循环
             }
         }while (isFormatValid == false);
 
-        try {
-            // 解析deadline为LocalDateTime对象
-            LocalDateTime deadline = LocalDateTime.parse(date, formatter);
-
-            // 创建事件并进行后续操作
-            todo.setDeadline(deadline);
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        // 创建事件并进行后续操作, 由输入的str日期解析为date类, 去在todo类的内部设置好deadline成员
+        todo.setDeadline_str(date);
 
         //提示输入描述, 将描述添加到todo对象中
         System.out.println("-------------Enter todo description:");
@@ -151,7 +154,7 @@ public class PIMManager {
         itemList.add(todo);
 
         //添加完之后输出反馈
-        System.out.println("--------⭐Successfully added⭐---------"+ "\n" + todo);
+        System.out.println("--------⭐Successfully Gained a new Todo⭐---------"+ "\n" + todo);
     }
 
     static void createEvent(){
@@ -387,6 +390,7 @@ public class PIMManager {
      */
 
     private static void updateData(){
+        updateCounter = 0;//计数器清零
 
         //用户输入想要update的item num
         if(itemList.size() >= 1){
@@ -406,19 +410,23 @@ public class PIMManager {
             }
 
             //update成功的item计数器
-            int updateCounter = 0;
 
             //应该是先判断当前的index是否合法, 合法则进入item遍历, 非法则继续下一个index
             for (int index: indices){
-                System.out.println("-------------updating Item " + (index+1) );
+                System.out.println("-------------Updating Item " + (index+1) );
+
                 //判断index合法性, 不使用iterator了, 实在是不好用
                 if( index >= 0 && index < itemList.size() ){
                     //index合法:
-                    itemList.get(index).update(sc);
-                    //itemList.remove(index);
-                    System.out.println("Item " + (index + 1) + " updated" + "\n");
-                    updateCounter++;
+                    System.out.println("-------------You choose ⭐Item " + (index + 1) + itemList.get(index));
 
+                    //即使index合法, 也有可能发生当前item没有更新成功的情况, update()返回的是布尔值
+                    if(itemList.get(index).update(sc)){
+                        updateCounter++;
+                        System.out.println("Item " + (index + 1) + " updated" + "\n");
+                    }else {
+                        System.out.println("-------------❗You didn't make any changes of Item "+ (index +1) + "\n");
+                    }
                 }else {
                     //继续循环下一个index,输出更新失败
                     System.out.println("-------------❗Invalid Item Number: " + (index + 1) + "; Failed to update❗" + "\n");
@@ -426,16 +434,40 @@ public class PIMManager {
             }
 
             //之后要save
-            System.out.println("-------------Do you want to save the update?  Enter y or n");
 
-            //saveData();
-            //输出反馈, 过程结束
-            System.out.println("-------------⭐End of Update⭐" + "\n" +
-                    "             ⭐" + updateCounter + " item(s) updated.");
+            //如果存在成功更新的记录, 询问是否save, 若不存在则直接输出反馈
+            if( updateCounter>0 ){
+                miguel2099:
+                while (  updateCounter>0 ){
+                    System.out.println("-------------Do you want to save the update?  Enter y or n");
+                    switch ( sc.nextLine() ){
+                        case "y":
+                            saveData();
+                            //saved = true;
+                            //输出反馈, 过程结束
+                            System.out.println("-------------⭐End of Update⭐" + "\n" +
+                                    "             ⭐" + updateCounter + " item(s) updated.");
+                            break miguel2099;
+                        case "n":
+                            loadData();
+                            //saved = true;
+                            //输出反馈, 过程结束
+                            System.out.println("-------------⭐End of Update⭐" + "\n" +
+                                    "             ⭐" + 0 + " item(s) updated.");
+                            break miguel2099;
+                        default:
+                            System.out.println("-------------❗the command is not exist❗");
+                    }
+                }
+            }else {
+                //不存在成功更新的记录, 输出反馈, 过程结束
+                System.out.println("-------------⭐End of Update⭐" + "\n" +
+                        "             ⭐" + 0 + " item(s) updated.");
+            }
         }else {
+            //整个item list 为空,无法更新
             System.out.println("-------------❗There's no record to update❗");
         }
-
     }
 
     static void printList(){
@@ -525,7 +557,7 @@ public class PIMManager {
 
                 case "u" :
                     updateData();//自动保存, 便于测试!
-                    saveData();
+                    //saveData();
                     continue ;
 
                 default:
