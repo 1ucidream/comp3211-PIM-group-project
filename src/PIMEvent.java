@@ -19,6 +19,8 @@ public class PIMEvent extends PIMEntity {
     LocalDateTime alarm_time;
     private String alarm_time_str;
 
+    Alarmer alarmer;
+
     /**
  * alarm的逻辑:
  * 1.键盘根据给的格式输入开始时间和提醒时间
@@ -31,13 +33,8 @@ public class PIMEvent extends PIMEntity {
     public PIMEvent() {
     }
 
-    public String getDate() {
-        return this.start_time_Str;
-    }
-
     public void setStart_time(LocalDateTime start_time){
         this.start_time = start_time;
-        setStart_time_Str();
     }
 
     public void setStart_time(){
@@ -66,7 +63,7 @@ public class PIMEvent extends PIMEntity {
 
         try {
             // 解析deadline为LocalDateTime对象
-            LocalDateTime deadline = LocalDateTime.parse(this.start_time_Str, formatter);
+            LocalDateTime deadline = LocalDateTime.parse(this.alarm_time_str, formatter);
 
             // 创建事件并进行后续操作
             setAlarm_time(deadline);
@@ -83,17 +80,24 @@ public class PIMEvent extends PIMEntity {
     public void setStart_time_Str(String s){
         this.start_time_Str = s;
 
-        setDeadline();
+        setStart_time();
     }
 
     public void setAlarm_time_Str(String s){
         this.alarm_time_str = s;
-
-        setDeadline();
+        setAlarm_time();
     }
 
 
-    private void setDeadline() {
+    public void setAlarmer(){
+        alarmer = new Alarmer(start_time, alarm_time, description);
+    }
+
+    public void updateAlarmer(){
+        alarmer.setAlarmTime(alarm_time);
+        alarmer.setStartTime(start_time);
+        alarmer.setDescription(description);
+        alarmer.resetClosed();//将弹窗状态置为false
     }
 
     public String getDescription() {
@@ -113,7 +117,9 @@ public class PIMEvent extends PIMEntity {
         return  "----------------------------------------"+ "\n" +
                 "---type: EVENT " + "\n" +
                 "---Start Time: " + this.start_time_Str + "\n" +
+                "---Alarm Time: " + this.alarm_time_str+ "\n" +
                 "---Description: " + this.description + "\n" +
+                "---alarm: " + this.alarmer + "\n" +
                 "----------------------------------------";
     }
 
@@ -255,9 +261,17 @@ public class PIMEvent extends PIMEntity {
             }
         }
 
-        /*if(isupdated){
-            PIMManager.updateCounter++;
-        }*/
+        //更新信息之后要重新设定alarm
+        //11-19更新: 有个bug, 应该是在update()运行完, 在manager判断是否保存, 运行save data()之后才设定新的弹窗生效,
+        // 但是没办法在save data的时候再调用更改的event对象去新设定alarmer的schedule方法
+
+        updateAlarmer();//也就是重新设定alarm的三个字段, 并且将alarm.isClosed置为 false 未触发
+        alarmer.scheduleAlarmer();
+
+        System.out.println("pimEvent line269处");
+
+        //PIMManager.loadData();
+
         return isupdated;
     }
 

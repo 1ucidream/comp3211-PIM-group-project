@@ -53,7 +53,7 @@ public class PIMManager {
     }
     public PIMManager() {}
 
-    private static void saveData() {
+    static void saveData() {
         if (dataFile.canWrite()) {
             try {
                 ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dataFile));
@@ -83,7 +83,7 @@ public class PIMManager {
         System.out.println("----------⭐Total " + itemList.size() + " records⭐-----------");
     }
 
-    private static void loadData() {
+    static void loadData() {
         if (dataFile.canRead() && dataFile.length() > 0L) {
             try {
                 ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dataFile));
@@ -176,7 +176,6 @@ public class PIMManager {
 
             if (!isFormatValid) {
                 System.out.println("Invalid format!");
-                continue;
             } else {
                 isFormatValid = true;
                 //break label;  在日期格式正确时跳出循环
@@ -197,6 +196,7 @@ public class PIMManager {
                 isFormatValid = true;
                 // 在日期格式正确时跳出循环
             }
+
             // 定义日期时间格式化器
             DateTimeFormatter formatter2 =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             try {
@@ -212,9 +212,7 @@ public class PIMManager {
                             "----------------------------------------"
                     );
                 }
-                // 创建事件并进行后续操作
-                event.setStart_time(startTime);
-                event.setAlarm_time(alarmTime);
+
 
             } catch (Exception e) {
                 //其实这个exception就包括了任何exception
@@ -225,16 +223,33 @@ public class PIMManager {
             }
         }while (isFormatValid == false);
 
+        // 创建事件并进行后续操作
+        event.setStart_time_Str(date);
+        event.setAlarm_time_Str(alarmTimeInput);
+
         //输入event描述
         System.out.println("-------------Enter event description:");
         text = sc.nextLine();
         event.setDescription(text);
+
+        //对事件创建一个基于当前alarm time和start time的提醒器alarmer
+        //注意, 初次设定提醒时间注意要在当前时间之后, 不然不会自动弹窗, 而是下一次运行程序load data之后弹窗
+        event.setAlarmer();//setalarm就是new一个alarm对象, 和更新alarm不一样
+
+        event.alarmer.scheduleAlarmer();
+
+        //输出alarm
+        System.out.println(event.alarmer);
 
         //添加到list
         itemList.add(event);
 
         //输出反馈
         System.out.println("--------⭐Successfully added⭐---------"+ "\n" + event);
+
+        //这里为什么要loaddata
+        /*System.out.println("manager line 243 loaddata");
+        loadData();*/
     }
 
     static void createNote(){
@@ -302,6 +317,7 @@ public class PIMManager {
             case "e"://把appoint改成event
                 createEvent();
                 saveData();
+                //loadData();
                 break;
 
             case "c":
@@ -445,6 +461,8 @@ public class PIMManager {
                             saveData();
                             //saved = true;
                             //输出反馈, 过程结束
+
+
                             System.out.println("-------------⭐End of Update⭐" + "\n" +
                                     "             ⭐" + updateCounter + " item(s) updated.");
                             break miguel2099;
@@ -525,6 +543,7 @@ public class PIMManager {
             dataFile.createNewFile();
         } else {
             loadData();
+            printList();
         }
 
         //感觉这个开始语句有点不显眼, 看能不能整点花样, 加点那种程序员图什么的
